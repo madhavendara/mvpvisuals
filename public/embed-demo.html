@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Store Embed Demo</title>
+    <style>
+      body { margin: 0; background: #ede8e7; color: #1d1d1d; font: 14px/1.4 Arial, Helvetica, sans-serif; }
+      header { padding: 16px 24px; background: #ffffff; border-bottom: 1px solid #ddd6d4; }
+      header strong { letter-spacing: .12em; }
+      header span { margin-left: 12px; color: #8a8584; font-size: 12px; }
+      main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; padding: 16px; }
+      iframe { width: 100%; height: calc(100vh - 100px); min-height: 640px; border: 0; background: #ffffff; }
+      aside { padding: 16px; background: #ffffff; overflow: auto; height: calc(100vh - 132px); }
+      h2 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
+      p { margin: 0 0 12px; color: #444444; font-size: 12px; }
+      pre { margin: 0 0 12px; padding: 10px; background: #f6f3f2; font-size: 11px; white-space: pre-wrap; word-break: break-all; }
+      @media (max-width: 900px) { main { grid-template-columns: 1fr; } aside { height: auto; } }
+    </style>
+  </head>
+  <body>
+    <header>
+      <strong>DEMO STORE</strong>
+    </header>
+    <main>
+      <iframe src="/" title="Tent configurator"></iframe>
+      <aside>
+        <h2>Theme cart handler</h2>
+        <div id="log"></div>
+      </aside>
+    </main>
+    <script>
+      const configuratorOrigin = window.location.origin
+      const log = document.getElementById('log')
+
+      window.addEventListener('message', (event) => {
+        if (event.origin !== configuratorOrigin) return
+        if (event.data.type !== 'tent-configurator:add-to-cart') return
+
+        const request = 'fetch(\'/cart/add.js\', {\n  method: \'POST\',\n  headers: { \'Content-Type\': \'application/json\' },\n  body: JSON.stringify(cart),\n})'
+        log.innerHTML = ''
+        const title = document.createElement('h2')
+        title.textContent = 'Received configuration ' + event.data.configurationId.slice(0, 8)
+        const total = document.createElement('p')
+        total.textContent = 'Quoted total: ' + (event.data.quote.totalMinor / 100).toLocaleString('en-IN', { style: 'currency', currency: event.data.quote.currency })
+        const callTitle = document.createElement('h2')
+        callTitle.textContent = 'Shopify Ajax call a theme would make'
+        const call = document.createElement('pre')
+        call.textContent = request
+        const bodyTitle = document.createElement('h2')
+        bodyTitle.textContent = 'cart'
+        const body = document.createElement('pre')
+        body.textContent = JSON.stringify(event.data.cart, null, 2)
+        log.append(title, total, callTitle, call, bodyTitle, body)
+      })
+    </script>
+  </body>
+</html>
