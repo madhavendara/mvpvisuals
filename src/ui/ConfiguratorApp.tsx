@@ -89,9 +89,14 @@ export default function ConfiguratorApp() {
   const [designOpen, setDesignOpen] = useState(false)
   const [busy, setBusy] = useState(false)
   const sceneState = useRef<RootState>(null)
+  const resultBox = useRef<HTMLDivElement>(null)
   const [result, setResult] = useState<{ id: string; pdfUrl: string; payload: unknown } | null>(null)
 
   useEffect(() => { setResult(null) }, [config])
+
+  useEffect(() => {
+    if (result) resultBox.current!.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [result])
 
   useEffect(() => {
     if (!errorToastVisible) return
@@ -177,7 +182,7 @@ export default function ConfiguratorApp() {
               <button className={styles.secondaryLink.base} type="button" onClick={openDesign}>Edit design</button>
             </>}
             <p className={styles.notice.base}>Custom {config.modelId} canopy tent with company logo, dye sublimation printing, and a lifetime frame warranty. 2-day production. No minimums, no setup fees.</p>
-            {result && <div className={styles.success.base}>
+            {result && <div ref={resultBox} className={styles.success.base}>
               Configuration saved: {result.id.slice(0, 8)}
               <br /><a className={styles.successLink.base} href={result.pdfUrl} target="_blank" rel="noreferrer">Download production PDF ↗</a>
               <pre className={styles.payload.base}>{JSON.stringify(result.payload, null, 2)}</pre>
