@@ -1,39 +1,45 @@
 # mvpvisuals
 
-Starting the application
+## Starting the application
+
+```sh
 npm install
-  npm run dev which first run validate:assets to check 3d models and then start both client and server. 
+npm run dev
+```
 
-Folder structure
-  data: save add to cart information and images captured
-  dist: build related files
-  glb: 3D model assets
-  public
-     cursors: cursor icon
-     embed-demo: iframe embedding example
-  scripts: model data extraction and validation scripts
-  server: mocked express backend server
-  src 
-    api
-      client.ts: it holds all API calls
-      useCatalogQuote: loading Catalog pricing and updating them based on selection
-    product: include product models and their sizes, design settings, pricing and options. and walls added into them. 
-    
-    scene
-      Scene.tsx: main render container with all parts
-      canopyTexture: main dynamic texture based on user design creation. 
-      snapshot: It renders the 3D view to a JPEG for the PDF on Add to cart
-      TentModel: main model imported from glb + canopyTexture
-      Walls: extra rendered walls for side walls
-   ui: product page ui
-   store.ts: main zustand store
+`npm run dev` first runs `validate:assets` to check the 3D models, then starts both the client and the server.
 
-   Decision i made on this application
-    1. Painting the canopy requires it's UV cordinates. now because we can't manually select or define data i decided to extract from glb model itself and define front,back,.. from it. via scripts/extract-uv-regions.mjs is this way if we even change model we just need to run npm run extract:uv
-    2. Walls: inside the model i don't have wall so i've added based on model size and footprint. so that we can also apply design on it. 
-    3. instead of manually side selection i've added svg based selection which uses same UV coordinates extracted to render scene in 2d. and let user to move and see changes in realtime. 
-    4. 2D and 3D share one transform (panelTransform), so artwork lands in the same place in the SVG editor and on the 3D tent.
-    5. as it is small application with shopify integration i've decided to go with lightweight library pdfkit rather than Puppeteer 
-    6. currently 6.5×6.5 GLB is modelled almost at 5×5 size so i had to manually scale it to match size so that user change reflect on it.  
+## Folder structure
 
+```
+data/                  saved add-to-cart configurations, captured 3D previews and uploaded images
+dist/                  build output, created by npm run build
+glb/                   3D model assets
+public/
+  cursors/             cursor icons
+  embed-demo.html      iframe embedding example
+scripts/               model data extraction and validation scripts
+server/                mocked Express backend server
+src/
+  api/
+    client.ts          all API calls
+    useCatalogQuote.ts loads the catalog and updates the price based on the selection
+  product/             product models and their sizes, design settings, pricing and options, and the walls added to them
+  scene/
+    Scene.tsx          main render container with all parts
+    canopyTexture.ts   dynamic canopy texture built from the user's design
+    snapshot.ts        renders the 3D view to a JPEG for the PDF on add to cart
+    TentModel.tsx      main model imported from the GLB, with canopyTexture applied
+    Walls.tsx          side walls rendered in code
+  ui/                  product page UI
+  store.ts             main Zustand store
+```
 
+## Decisions I made on this application
+
+1. **UV coordinates come from the GLB.** Painting the canopy requires its UV coordinates. Because we can't manually select or define this data, I decided to extract it from the GLB model itself and define front, back, left and right from it, via `scripts/extract-uv-regions.mjs`. This way, if we change the model, we just need to run `npm run extract:uv`.
+2. **Walls are built in code.** The model doesn't include walls, so I've added them based on the model size and footprint, so that designs can also be applied to them.
+3. **SVG-based 2D editor.** Instead of manual side selection, I've added SVG-based selection that uses the same extracted UV coordinates to render the scene in 2D, and lets the user move artwork and see the changes in real time.
+4. **One shared transform.** 2D and 3D share one transform (`panelTransform`), so artwork lands in the same place in the SVG editor and on the 3D tent.
+5. **PDFKit for the PDF.** As this is a small application with Shopify integration, I decided to go with the lightweight library PDFKit rather than Puppeteer.
+6. **6.5×6.5 model scaling.** The supplied 6.5×6.5 GLB is modelled at almost the 5×5 size, so I scale it in code to its real size, so that the size the user picks is reflected in the 3D view.
